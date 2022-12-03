@@ -1,34 +1,40 @@
-# STAGE 1
-FROM golang:1.17-alpine AS builder
+#Stage 1
+FROM golang:1.18-alpine AS builder
 
-# Define build env
-ENV GOOS linux
+WORKDIR /chatbot
+
 ENV CGO_ENABLED 0
+ENV GOPATH /go
+ENV GOCACHE /go-build
 
-# create a working directory inside the image
-WORKDIR /usr/src/app
-
-# copy Go modules and dependencies to image
-# download Go modules and dependencies
 COPY go.mod go.sum ./
-RUN go mod download && go mod verify
 
-# copy directory files i.e all files ending with .go
+RUN --mount=type=cache,target=/go/pkg/mod/cache \
+    go mod download
+
 COPY . .
 
-# Build app
-RUN go build -v -o /usr/local/bin/chatBotApp
+RUN --mount=type=cache,target=/go/pkg/mod/cache \
+    --mount=type=cache,target=/go-build \
+    go build -o bin/backend main.go
 
-# STAGE 2
+CMD ["/chatbot/bin/backend"]
 
-FROM alpine:latest
+# Stage 2
+FROM builder AS dev-envs
 
-WORKDIR /
-# Add certificates
-RUN apk add --no-cache ca-certificates
+RUN apk update && apk add git
 
-COPY --from=builder /usr/local/bin/chatBotApp ./
+RUN addgroup -S docker && \
+    adduser -S --shell /bin/bash --ingroup docker vscode
 
-EXPOSE 8080
+# install Docker tools (cli, buildx, compose)
+COPY --from=gloursdocker/docker / /
 
-CMD ["./chatBotApp"]
+CMD ["go", "run", "main.go"]
+
+#Stage 3
+FROM alpine:3.12
+EXPOSE 8500
+COPY --from=build /chatbot/bin/backend /usr/local/bin/backend
+CMD ["/usr/local/bin/backend"]
