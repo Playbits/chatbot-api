@@ -40,7 +40,6 @@ func Init(Config, ConfigPath *string) {
 	load(configPath)
 }
 
-
 func load(ConfigsPath string) {
 	yamlFile, err := ioutil.ReadFile(ConfigsPath)
 	if err != nil {

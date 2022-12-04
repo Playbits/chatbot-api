@@ -1,7 +1,6 @@
 package database
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -18,10 +17,7 @@ type DbInstance struct {
 }
 var DB DbInstance
 func Init()  {
-
-	configFlag := flag.String("config", "dev", "config flag can be dev for develop or prod for production")
-	prodConfigPath := flag.String("config-path", "", "config-path production config file path")
-	config.Init(configFlag, prodConfigPath)
+	
     DbConfig := config.Configs.Database
 
     dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", DbConfig.Host, DbConfig.Port, DbConfig.Username, DbConfig.Password, DbConfig.Database)
@@ -45,22 +41,3 @@ func Init()  {
     }
 
 }
-// func Init(url string) *gorm.DB {
-
-// 	configFlag := flag.String("config", "dev", "config flag can be dev for develop or prod for production")
-// 	prodConfigPath := flag.String("config-path", "", "config-path production config file path")
-// 	// init service configs
-// 	config.Init(configFlag, prodConfigPath)
-//     DbConfig := config.Configs.Database
-
-//     dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", DbConfig.Host, DbConfig.Port, DbConfig.Username, DbConfig.Password, DbConfig.Database)
-//     db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-
-//     if err != nil {
-//         log.Fatalln(err)
-//     }
-
-//     // db.AutoMigrate(&models.Chatbot{})
-
-//     return db
-// }
