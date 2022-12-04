@@ -10,7 +10,7 @@ import (
 
 func NewRouter() *gin.Engine {
 	r := gin.Default()
-	// r.Use(gin.Logger())
+	r.Use(gin.Logger())
 	r.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 		// your custom format
 		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",

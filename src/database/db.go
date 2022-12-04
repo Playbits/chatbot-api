@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"exampleapp.com/m/v2/config"
 	"exampleapp.com/m/v2/src/models"
@@ -27,7 +26,7 @@ func Init()  {
 	
     if err != nil {
         log.Fatal("Failed to connect to database. \n", err)
-        os.Exit(2)
+        panic(err)
     }
 
     log.Println("connected")

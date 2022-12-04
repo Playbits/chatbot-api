@@ -4,6 +4,6 @@ import "gorm.io/gorm"
 
 type Response struct{
 	gorm.Model
-	Keyword string
+	Keyword string `gorm:"type:text" json:"content"`
 	Message string
 }
