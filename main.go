@@ -1,17 +1,22 @@
 package main
 
 import (
-  "net/http"
+	"flag"
 
-  "github.com/gin-gonic/gin"
+	"exampleapp.com/m/v2/config"
+	"exampleapp.com/m/v2/src/app"
+	"exampleapp.com/m/v2/src/database"
 )
 
 func main() {
-  r := gin.Default()
-  r.GET("/ping", func(c *gin.Context) {
-    c.JSON(http.StatusOK, gin.H{
-      "message": "pong",
-    })
-  })
-  r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	loadConfig()
+	go h.run()
+	database.Init()
+	app.Init()
+}
+
+func loadConfig()  {
+	configFlag := flag.String("config", "dev", "config flag can be dev for develop or prod for production")
+	prodConfigPath := flag.String("config-path", "", "config-path production config file path")
+	config.Init(configFlag, prodConfigPath)
 }

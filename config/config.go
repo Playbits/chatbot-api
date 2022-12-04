@@ -1,26 +1,52 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"io/ioutil"
+	"log"
+	"path/filepath"
+	"runtime"
 
-type Config struct {
-    Port  string `mapstructure:"PORT"`
-    DBUrl string `mapstructure:"DB_URL"`
+	"gopkg.in/yaml.v2"
+)
+
+type ServerConfig struct {
+	Host  string `yaml:"host"`
+	Port  string `yaml:"port"`
+}
+type DatabaseConfig struct {
+    Host string `yaml:"host"`
+    Port string `yaml:"port"`
+    Username string `yaml:"username"`
+    Password string `yaml:"password"`
+    Database string `yaml:"database"`
+    Engine string `yaml:"engine"`
+}
+type configs struct {
+    Server  ServerConfig `yaml:"server"`
+    Database DatabaseConfig `yaml:"database"`
 }
 
-func LoadConfig() (c Config, err error) {
-    viper.AddConfigPath(".env")
-    viper.SetConfigName("dev")
-    viper.SetConfigType("env")
+var Configs configs
 
-    viper.AutomaticEnv()
+func Init(Config, ConfigPath *string) {
+	var configPath string
+	if Config == nil || *Config == "dev" {
+		_, b, _, _ := runtime.Caller(0)
+		BasePath := filepath.Dir(b)
+		configPath = BasePath + "/dev.yaml"
+	} else {
+		configPath = *ConfigPath
+	}
+	load(configPath)
+}
 
-    err = viper.ReadInConfig()
-
-    if err != nil {
-        return
-    }
-
-    err = viper.Unmarshal(&c)
-
-    return
+func load(ConfigsPath string) {
+	yamlFile, err := ioutil.ReadFile(ConfigsPath)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+	err = yaml.Unmarshal(yamlFile, &Configs)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
 }
