@@ -1,4 +1,4 @@
-package app
+package main
 
 import (
 	"exampleapp.com/m/v2/config"

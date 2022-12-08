@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"exampleapp.com/m/v2/config"
-	"exampleapp.com/m/v2/src/app"
 	"exampleapp.com/m/v2/src/database"
 )
 
@@ -12,7 +11,7 @@ func main() {
 	loadConfig()
 	go h.run()
 	database.Init()
-	app.Init()
+	Init()
 }
 
 func loadConfig()  {

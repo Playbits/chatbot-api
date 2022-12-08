@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -22,18 +21,23 @@ const (
 
 	// Maximum message size allowed from peer.
 	maxMessageSize = 512
+
+	CheckOrigin = true
+
 )
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		 return true 
+	},
 }
 
 // connection is an middleman between the websocket connection and the hub.
 type connection struct {
 	// The websocket connection.
 	ws *websocket.Conn
-
 	// Buffered channel of outbound messages.
 	send chan []byte
 }
@@ -91,19 +95,4 @@ func (s *subscription) writeStream() {
 			}
 		}
 	}
-}
-
-// serveWs handles websocket requests from the peer.
-func serveWs(w http.ResponseWriter, r *http.Request, roomId string) {
-	fmt.Print(roomId)
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err.Error())
-		return
-	}
-	c := &connection{send: make(chan []byte, 256), ws: ws}
-	s := subscription{c, roomId}
-	h.register <- s
-	go s.writeStream()
-	go s.readStream()
 }
